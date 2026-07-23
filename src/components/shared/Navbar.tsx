@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiMenu, FiX, FiArrowRight, FiUser, FiLogOut } from "react-icons/fi";
-import { BiCompass } from "react-icons/bi";
+
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -24,7 +24,7 @@ export default function Navbar({
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Explore", href: "/explore" },
+    { name: "Explore", href: "/plans" },
     { name: "About", href: "/about" },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
