@@ -12,6 +12,7 @@
     "@better-auth/mongo-adapter": "^1.6.23",
     "@heroui/react": "^3.2.2",
     "@heroui/styles": "^3.2.2",
+    "@lottiefiles/dotlottie-react": "^0.19.12",
     "better-auth": "^1.6.23",
     "framer-motion": "^12.42.2",
     "mongodb": "^7.5.0",

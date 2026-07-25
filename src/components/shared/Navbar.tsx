@@ -3,24 +3,24 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiMenu, FiX, FiArrowRight, FiUser, FiLogOut } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
 
 
-interface NavbarProps {
-  isLoggedIn?: boolean;
-  userPhoto?: string;
-  onLogout?: () => void;
-}
 
-export default function Navbar({ 
-  isLoggedIn = false, 
-  userPhoto, 
-  onLogout 
-}: NavbarProps) {
+
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname(); 
+  const pathname = usePathname();
+
+  const userData = authClient.useSession();
+  const user = userData?.data?.user;
+
+  const router = useRouter();
+
+
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -31,26 +31,31 @@ export default function Navbar({
   ];
 
   const dashboardLinks = [
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "AI Recommendations", href: "/ai-recommendations" },
     { name: "AI Planner", href: "/ai-planner" },
     { name: "Manage Plans", href: "/manage-plans" },
     { name: "Profile", href: "/profile" },
   ];
 
-  const currentLinks = isLoggedIn ? [...navLinks.slice(0, 2), ...dashboardLinks] : navLinks;
+  const currentLinks = user ? [...navLinks.slice(0, 2), ...dashboardLinks] : navLinks;
+  const handleLogout = async () => {
+    await authClient.signOut();
 
+    router.push("/");
+    router.refresh();
+  };
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-[#E9ECEF] bg-[#F8F9FA]/80 backdrop-blur-xl transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          
-         
+
+
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="relative h-8 w-8">
-                <Image 
-                  src="/images/logo.png" 
-                  alt="StudyPilot AI Logo" 
+                <Image
+                  src="/images/logo.png"
+                  alt="StudyPilot AI Logo"
                   fill
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
                   priority
@@ -62,7 +67,7 @@ export default function Navbar({
             </Link>
           </div>
 
-         
+
           <div className="hidden md:flex items-center gap-1">
             {currentLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -70,11 +75,10 @@ export default function Navbar({
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                    isActive 
-                      ? "text-[#4F46E5] bg-[#F1F3F5]" 
-                      : "text-[#495057] hover:text-[#4F46E5] hover:bg-[#F1F3F5]"
-                  }`}
+                  className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isActive
+                    ? "text-[#4F46E5] bg-[#F1F3F5]"
+                    : "text-[#495057] hover:text-[#4F46E5] hover:bg-[#F1F3F5]"
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -82,19 +86,19 @@ export default function Navbar({
             })}
           </div>
 
-          
+
           <div className="hidden md:flex items-center gap-4">
-            {isLoggedIn ? (
+            {user ? (
               <div className="flex items-center gap-3">
                 <div className="relative h-9 w-9 overflow-hidden rounded-full border border-[#E9ECEF] bg-[#F1F3F5] flex items-center justify-center">
-                  {userPhoto ? (
-                    <Image src={userPhoto} alt="User Profile" fill className="object-cover" />
+                  {user.image ? (
+                    <Image src={user.image} alt="User Profile" fill className="object-cover" />
                   ) : (
                     <FiUser className="text-[#6C757D] text-lg" />
                   )}
                 </div>
                 <button
-                  onClick={onLogout}
+                  onClick={handleLogout}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#6C757D] hover:text-[#4F46E5] transition-colors duration-200 rounded-lg hover:bg-[#F1F3F5]"
                 >
                   <FiLogOut />
@@ -103,8 +107,8 @@ export default function Navbar({
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <Link 
-                  href="/login" 
+                <Link
+                  href="/login"
                   className="px-4 py-2 text-sm font-medium text-[#495057] hover:text-[#4F46E5] transition-colors duration-200"
                 >
                   Login
@@ -120,10 +124,10 @@ export default function Navbar({
             )}
           </div>
 
-          
+
           <div className="flex md:hidden">
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsOpen((prev) => !prev)}
               className="inline-flex items-center justify-center rounded-xl p-2 text-[#495057] hover:bg-[#F1F3F5] hover:text-[#1A1A1A] transition-colors"
             >
               {isOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
@@ -132,7 +136,7 @@ export default function Navbar({
         </div>
       </div>
 
-    
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -150,24 +154,23 @@ export default function Navbar({
                     key={link.name}
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`block rounded-xl px-3 py-2.5 text-base font-medium transition-colors ${
-                      isActive 
-                        ? "text-[#4F46E5] bg-[#F8F9FA]" 
-                        : "text-[#495057] hover:bg-[#F8F9FA] hover:text-[#4F46E5]"
-                    }`}
+                    className={`block rounded-xl px-3 py-2.5 text-base font-medium transition-colors ${isActive
+                      ? "text-[#4F46E5] bg-[#F8F9FA]"
+                      : "text-[#495057] hover:bg-[#F8F9FA] hover:text-[#4F46E5]"
+                      }`}
                   >
                     {link.name}
                   </Link>
                 );
               })}
 
-              
+
               <div className="mt-4 border-t border-[#E9ECEF] pt-4 flex flex-col gap-2">
-                {isLoggedIn ? (
+                {user ? (
                   <button
                     onClick={() => {
                       setIsOpen(false);
-                      if (onLogout) onLogout();
+                      handleLogout();
                     }}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#E9ECEF] bg-white px-4 py-2.5 text-base font-medium text-[#6C757D] hover:bg-[#F8F9FA]"
                   >
