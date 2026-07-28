@@ -33,6 +33,7 @@ export default function Navbar() {
   const dashboardLinks = [
     { name: "AI Recommendations", href: "/ai-recommendations" },
     { name: "AI Planner", href: "/ai-planner" },
+    { name: "Create Study Plan", href: "/add-plan" },
     { name: "Manage Plans", href: "/manage-plans" },
     { name: "Profile", href: "/profile" },
   ];

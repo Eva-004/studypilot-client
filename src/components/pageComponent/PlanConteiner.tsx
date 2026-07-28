@@ -65,7 +65,7 @@ export default function PlanConteiner({
                     </div>
 
                     <Link
-                        href="/dashboard/add-plan"
+                        href="/add-plan"
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4F46E5] to-[#6366F1] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-[#4F46E5]/10 transition-all duration-300 hover:opacity-95 active:scale-[0.98]"
                     >
                         <FiPlus className="text-base" />
