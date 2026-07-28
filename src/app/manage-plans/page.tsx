@@ -4,18 +4,20 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
-  FiCalendar, 
-  FiClock, 
-  FiPlus, 
-  FiLoader, 
-  FiCheckCircle, 
+import {
+  FiCalendar,
+  FiClock,
+  FiPlus,
+  FiLoader,
+  FiCheckCircle,
   FiAlertCircle,
   FiBookOpen,
   FiEdit3,
   FiTrash2
 } from "react-icons/fi";
 import { authClient, useSession } from "@/lib/auth-client";
+import UpdatePlan from "@/components/pageComponent/UpdatePlan";
+import DeletePlan from "@/components/pageComponent/DeletePlan";
 
 // Core Data Type Definition
 export interface StudyPlan {
@@ -39,59 +41,123 @@ interface AlertMessage {
 const ManagePlansPage: React.FC = () => {
   const router = useRouter();
   const userData = authClient.useSession();
-    const user = userData?.data?.user;
+  const user = userData?.data?.user;
 
   const [plans, setPlans] = useState<StudyPlan[]>([]);
-const [loading, setLoading] = useState(true);
-const [message, setMessage] = useState<AlertMessage | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<AlertMessage | null>(null);
 
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+  const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
-const fetchPlans = useCallback(async () => {
-  if (!user?.email) return;
+  const fetchPlans = useCallback(async () => {
+    if (!user?.email) return;
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const response = await fetch(
-      `${SERVER_URL}/plans`
-    );
+      const response = await fetch(
+        `${SERVER_URL}/plans`
+      );
 
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch plans");
+      if (!response.ok) {
+        throw new Error("Failed to fetch plans");
+      }
+
+      const data = await response.json();
+
+      const expectedData = data.filter(dt => dt.userEmail === user.email);
+
+      setPlans(expectedData);
+    } catch (error) {
+      console.error("Error fetching plans:", error);
+
+      setMessage({
+        type: "error",
+        text: "Failed to load study plans.",
+      });
+    } finally {
+      setLoading(false);
     }
+  }, [user?.email]);
 
-    const data = await response.json();
+  useEffect(() => {
+    fetchPlans();
+  }, [fetchPlans]);
 
-    const expectedData = data.filter(dt=> dt.userEmail === user.email);
+  const handleUpdatePlan = async (
+    planId: string,
+    updates: Partial<StudyPlan>
+  ): Promise<void> => {
+    try {
+      const response = await fetch(
+        `${SERVER_URL}/plans/${planId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updates),
+        }
+      );
 
-    setPlans(expectedData);
-  } catch (error) {
-    console.error("Error fetching plans:", error);
+      if (!response.ok) {
+        throw new Error("Failed to update plan");
+      }
 
-    setMessage({
-      type: "error",
-      text: "Failed to load study plans.",
-    });
-  } finally {
-    setLoading(false);
-  }
-}, [user?.email]);
+      const data = await response.json();
 
-useEffect(() => {
-  fetchPlans();
-}, [fetchPlans]);
- 
-  const handleOpenEditModal = (plan: StudyPlan): void => {
-    console.log("Edit Modal Triggered for Plan ID:", plan._id);
-    // TODO: Connect Edit Modal Component Here
+      console.log("Updated plan:", data);
+
+      // Update UI immediately
+      setPlans((previousPlans) =>
+        previousPlans.map((plan) =>
+          plan._id === planId
+            ? { ...plan, ...updates }
+            : plan
+        )
+      );
+
+      setMessage({
+        type: "success",
+        text: "Study plan updated successfully.",
+      });
+
+    } catch (error) {
+      console.error("Update plan error:", error);
+
+      setMessage({
+        type: "error",
+        text: "Failed to update study plan.",
+      });
+    }
   };
 
-  const handleOpenDeleteModal = (planId: string): void => {
-    console.log("Delete Modal Triggered for Plan ID:", planId);
-    // TODO: Connect Delete Modal Component Here
+  const handleDeletePlan = async (planId: string): Promise<void> => {
+    try {
+      const response = await fetch(`${SERVER_URL}/plans/${planId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete plan");
+      }
+
+      
+      setPlans((prevPlans) => prevPlans.filter((plan) => plan._id !== planId));
+
+      setMessage({
+        type: "success",
+        text: "Study plan deleted successfully.",
+      });
+    } catch (error) {
+      console.error("Delete plan error:", error);
+      setMessage({
+        type: "error",
+        text: "Failed to delete study plan.",
+      });
+    }
   };
 
   if (loading) {
@@ -107,7 +173,7 @@ useEffect(() => {
   return (
     <main className="min-h-screen bg-[#F8F9FA] py-10 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -131,11 +197,10 @@ useEffect(() => {
         {/* Feedback Alert */}
         {message && (
           <div
-            className={`mb-6 p-4 rounded-xl flex items-center gap-3 text-sm font-semibold ${
-              message.type === "success"
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
-                : "bg-rose-50 text-rose-700 border border-rose-100"
-            }`}
+            className={`mb-6 p-4 rounded-xl flex items-center gap-3 text-sm font-semibold ${message.type === "success"
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+              : "bg-rose-50 text-rose-700 border border-rose-100"
+              }`}
           >
             {message.type === "success" ? <FiCheckCircle className="text-lg" /> : <FiAlertCircle className="text-lg" />}
             <span>{message.text}</span>
@@ -190,25 +255,11 @@ useEffect(() => {
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#F8F9FA] text-[#1A1A1A]">
                     {plan.status}
                   </span>
-                  
+
                   {/* Action Buttons */}
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditModal(plan)}
-                      className="p-2 text-[#4F46E5] hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                      title="Edit Plan"
-                    >
-                      <FiEdit3 className="text-base" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenDeleteModal(plan._id)}
-                      className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                      title="Delete Plan"
-                    >
-                      <FiTrash2 className="text-base" />
-                    </button>
+                    <UpdatePlan plan={plan} onUpdate={handleUpdatePlan} />
+                    <DeletePlan plan={plan} onDelete={handleDeletePlan}/>
                   </div>
                 </div>
               </motion.div>
