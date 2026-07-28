@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StudyPilot AI
 
-## Getting Started
+> An AI-powered study planning platform that helps students create personalized study plans using an Agentic AI Study Planner.
 
-First, run the development server:
+StudyPilot AI is a full-stack web application designed to make study planning smarter and more personalized. The core feature is an **Agentic AI Study Planner** that analyzes a student's goals, subject, exam date, available study time, and priorities to generate a structured study plan.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The project was developed using an **AI-Assisted Vibe Coding approach**, where AI tools were used as a development partner for implementation exploration, debugging, refactoring, prompt engineering, and problem-solving, while the overall architecture, feature decisions, integration, testing, and final implementation were reviewed and adapted throughout development.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Live demo: https://studypilot-client.vercel.app/
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
-## Learn More
+### AI Study Planner
 
-To learn more about Next.js, take a look at the following resources:
+- Generates personalized study plans using Agentic AI
+- Analyzes study goals and requirements
+- Considers exam dates and available study time
+- Prioritizes study requirements
+- Generates structured and actionable study plans
+- Supports regenerating AI-generated plans
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Study Plan Management
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Create study plans
+- View study plan details
+- Manage existing plans
+- Delete plans
+- Set study priority
+- Track study-related information
 
-## Deploy on Vercel
+### Explore Study Plans
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Search study plans by title
+- Filter plans by priority
+- Sort plans by exam date
+- Pagination
+- Loading skeletons
+- Responsive study plan cards
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Authentication
+
+- User registration
+- User login
+- Google authentication
+- Protected routes
+- Secure API access
+- User-specific study plans
+
+### Dashboard
+
+- Overview of study plans
+- Study statistics
+- Progress visualization
+- Interactive charts
+- Quick access to AI Study Planner
+
+### Responsive UI
+
+- Mobile responsive
+- Tablet responsive
+- Desktop optimized
+- Consistent component design
+- Loading and empty states
+- Error handling
+
+---
+
+## Agentic AI Workflow
+
+The main AI workflow of StudyPilot AI follows a context-aware planning process:
+
+```text
+User
+  ↓
+Study Requirements
+  ↓
+AI Study Planner Agent
+  ↓
+Context Analysis
+  ↓
+Planning & Decision Making
+  ↓
+Personalized Study Plan
+  ↓
+User Review
+  ↓
+Save & Manage Plan
